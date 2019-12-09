@@ -1,11 +1,12 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include <time.h>
 
-#define MATSIZE 40000
+#define MATSIZE 5000
 
 int main()
 {
-
+		clock_t time; 
         int *ans,*first,*second;
         int *A,*B,*C;
         int i,j,k=0;
@@ -46,6 +47,7 @@ int main()
         first=A;        
         second= B;      
 
+        time = clock();
         if(rowA==1 && colB==1)
         {
             for(i=0;i<rowA;i++)
@@ -74,8 +76,9 @@ int main()
         }//i
 
         }
-
-        printf("\nvalor da matriz 'C' = \n");
+        time = clock() - time;
+        printf("Tempo total : %.2f segundos \n", ((double)time)/CLOCKS_PER_SEC);
+        //printf("\nvalor da matriz 'C' = \n");
 
         ans = C;
 
