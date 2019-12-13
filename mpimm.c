@@ -11,15 +11,16 @@
 
 double CLOCK_RATE = 700000000.0;
 int MY_RANK;
+int MATRIZ_SIZE = MATRIX_SIZE;
 
 int index_translate( int r, int c ) {
-	return (r * MATRIX_SIZE) + c;
+	return (r * MATRIZ_SIZE) + c;
 }
 
 double matrix_mult( double *A, double *B, int cRow, int cCol ) {
 	int idx;
 	double sum = 0;
-	for (idx = 0; idx < MATRIX_SIZE; idx++) {
+	for (idx = 0; idx < MATRIZ_SIZE; idx++) {
 		sum += A[index_translate(cRow, idx)] * B[index_translate(idx, cCol)];
 	}
 	return sum;
@@ -28,6 +29,10 @@ double matrix_mult( double *A, double *B, int cRow, int cCol ) {
 int main(int argc, char **argv)
 {
 	unsigned int matrix_size=MATRIX_SIZE;
+	if(argc==2){
+		matrix_size = atoi(argv[1]);
+		MATRIZ_SIZE = matrix_size;
+	}
 	clock_t start_t, end_t, total_t;
 
   int i, j;
