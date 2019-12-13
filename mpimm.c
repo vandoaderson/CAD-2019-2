@@ -105,9 +105,7 @@ int main(int argc, char **argv)
 
 	while (partitionsRemaining > 0) {
 		printf("[%2d] %d / %d particoes faltando.\n", myRank, partitionsRemaining, commSize);
-		if (partitionsRemaining != commSize) { //This isn't the first go	
-			//Get the next B offset and partition
-			//startRecv = rdtsc();
+		if (partitionsRemaining != commSize) {			
 			int sourceRank = myRank -1;
 			if (sourceRank == -1) { sourceRank = commSize-1; }
 			MPI_Irecv(recvBuffer, 1, MPI_Partition, sourceRank, MPI_ANY_TAG, MPI_COMM_WORLD, &requests[RECV]);
@@ -163,7 +161,6 @@ int main(int argc, char **argv)
 
 	printf("[%d] Analisando\n", myRank);
 
-	//int PRINT_CORRECTNESS_CHECK = 1;
 
 	MPI_Barrier(MPI_COMM_WORLD);
 	if (myRank == 0) {
