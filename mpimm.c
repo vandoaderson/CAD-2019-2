@@ -5,7 +5,7 @@
 #include <time.h>
 #include <mpi.h>
 
-#define MATRIX_SIZE 900
+#define MATRIX_SIZE 3000
 #define SEND 0
 #define RECV 1
 
