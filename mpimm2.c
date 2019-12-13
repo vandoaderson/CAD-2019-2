@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <rdtsc.h>
-#include <mtrand.h>
+//#include <mtrand.h>
 #include <mpi.h>
 
 #define MATRIX_SIZE 16
@@ -59,7 +58,7 @@ int main(int argc, char **argv)
 
 	//TODO: Rewrite this to use tabs, not spaces
 	rng_init_seeds[0] = myRank;
-  init_by_array(rng_init_seeds, rng_init_length);	
+  	//init_by_array(rng_init_seeds, rng_init_length);	
 
 	partitionSize = matrix_size / commSize;
 	startIdx = partitionSize * myRank;
@@ -83,8 +82,8 @@ int main(int argc, char **argv)
 
 	for( i = 0; i < partitionSize; i++ ) {
   	for( j = 0; j < matrix_size; j++ ) {
-			A_ROWS[index_translate(i, j)] = genrand_res53();
-	    B_COLS[index_translate(j, i)] = genrand_res53();
+			A_ROWS[index_translate(i, j)] = 1;
+	    B_COLS[index_translate(j, i)] = 1;
 	  }
 	}
 
@@ -114,7 +113,7 @@ int main(int argc, char **argv)
 		printf("[%2d] %d / %d partitions remaining.\n", myRank, partitionsRemaining, commSize);
 		if (partitionsRemaining != commSize) { //This isn't the first go	
 			//Get the next B offset and partition
-			startRecv = rdtsc();
+			//startRecv = rdtsc();
 			int sourceRank = myRank -1;
 			if (sourceRank == -1) { sourceRank = commSize-1; }
 			MPI_Irecv(recvBuffer, 1, MPI_Partition, sourceRank, MPI_ANY_TAG, MPI_COMM_WORLD, &requests[RECV]);
@@ -124,7 +123,7 @@ int main(int argc, char **argv)
 			printf("[%d] Posted recv for BSrc %d\n", myRank, Bsource);
 
 			//Post a send to get the current B partition out of here
-			startSend = rdtsc();
+			//startSend = rdtsc();
 			int destRank = (myRank+1) % commSize;
 			MPI_Isend(B_COLS, 1, MPI_Partition, destRank, 1, MPI_COMM_WORLD, &requests[SEND]);
 			printf("[%d] Posted send of current data\n", myRank);
@@ -133,10 +132,10 @@ int main(int argc, char **argv)
 				printf("[%d] Beginning wait...\n", myRank);
 				MPI_Waitany(2, requests, &completedIdx, MPI_STATUS_IGNORE);
 				if (completedIdx == RECV) {
-					finishRecv = rdtsc();
+					//finishRecv = rdtsc();
 					printf("[%d] Completed recv\n", myRank);
 				} else if (completedIdx == SEND) {
-					finishSend = rdtsc();
+					//finishSend = rdtsc();
 					printf("[%d] Completed send\n", myRank);
 				} else { printf("[%d] PROBLEM!\n", myRank); }
 				requests[completedIdx] = MPI_REQUEST_NULL;
@@ -172,14 +171,14 @@ int main(int argc, char **argv)
 
 		//Now compute a block of C for the current B partition
 		printf("[%d] Starting compute\n", myRank);
-		startComp = rdtsc();
+		//startComp = rdtsc();
 		for (i = 0; i < partitionSize; i++) {
 			for (j = 0; j < partitionSize; j++) {
 				C_ROWS[index_translate(i, j+col_offset)] = matrix_mult( A_ROWS, B_COLS, i, j );
 				
 			}
 		}
-		finishComp = rdtsc();
+		//finishComp = rdtsc();
 		printf("[%d] Finished compute\n", myRank);
 		my_compute_time += (finishComp - startComp) / CLOCK_RATE;
 		partitionsRemaining--;
